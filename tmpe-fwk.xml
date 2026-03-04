@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ndsda:NodeMap
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ndsda="http://www.example.org/ndsda"
+    xsi:schemaLocation="http://www.example.org/ndsda ../nds-deviceaccess/src/main/ndsdaNodeMapSchema.xsd" >
+
+    <ndsda:PVMap>
+        <ndsda:PV name="SampleEOC"  register="BSP.SAMP_EOC" type="int32"/>
+        <ndsda:PV name="ADCConfig"  register="BSP.ADC_CONFIG" type="int32"/>
+        <ndsda:PV name="DACConfig"  register="BSP.DAC_CONFIG" type="int32"/>
+        <ndsda:PV name="C2HEna"     register="BSP.C2H_ENA"    type="int32"/>
+        <ndsda:PV name="DMASamples" register="DMA_SAMPLES"    type="vector(uint32)" nElem="200" />
+    </ndsda:PVMap>
+</ndsda:NodeMap>

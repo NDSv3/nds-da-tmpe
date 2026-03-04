@@ -1,0 +1,19 @@
+﻿---
+BasedOnStyle: Google
+AlignAfterOpenBracket: BlockIndent
+AlignConsecutiveAssignments: 'true'
+AlignOperands: 'true'
+IndentWidth: '4'
+IndentWrappedFunctionNames: 'true'
+KeepEmptyLinesAtTheStartOfBlocks: 'true'
+MaxEmptyLinesToKeep: '1'
+SortIncludes: 'false'
+SortUsingDeclarations: 'false'
+SpaceBeforeAssignmentOperators: 'true'
+SpaceBeforeParens: ControlStatements
+TabWidth: '4'
+UseTab: Never
+ColumnLimit: 0
+AccessModifierOffset: -4
+
+...

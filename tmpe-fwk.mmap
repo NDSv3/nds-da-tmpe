@@ -1,0 +1,27 @@
+# TMPE-FWK Memory Map
+# David Andrino - I2A2
+#
+# Copyright (c) 2025, I2A2
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+@MAPFILE_REVISION 0.0.0-11-g2b078ea4-beast
+# path                                              nElements     address       nBytes  BAR width fixed sgnd AccMode
+.BSP                                                        4  0x00000000           16    0    32     0    0   RW
+BSP.SAMP_EOC                                                1  0x00000000            4    0    32     0    0   RW
+BSP.ADC_CONFIG                                              1  0x00000004            4    0    32     0    0   RW
+BSP.DAC_CONFIG                                              1  0x00000008            4    0    32     0    0   RW
+BSP.C2H_ENA                                                 1  0x0000000C            4    0     1     0    0   RW
+
+.DMA_SAMPLES                                              200  0x00000000          800   13    32     0    0   RW

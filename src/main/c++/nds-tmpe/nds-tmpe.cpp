@@ -1,11 +1,10 @@
 #include "nds-tmpe.hpp"
 #include <nds3/definitions.h>
+#include <nds3/impl/baseImpl.h>
 #include <nds3/nds.h>
+#include <nds3/impl/pvBaseInImpl.h>
 
 using nds_tmpe::tmpeDevice;
-int nds_tmpe_test(int x) {
-    return x;
-}
 
 static const nds::namedParameters_t addDefaultParams(const nds::namedParameters_t& params) {
     auto newParams = params;  // Copy contents

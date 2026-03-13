@@ -12,7 +12,7 @@ using BasicTests = ndstmpeFixture;
 
 static constexpr size_t READ_VALUES = 200;
 
-TEST_F(BasicTests, test1) {
+TEST_F(BasicTests, PlainPVTest) {
     int32_t val;
     timespec time;
     std::vector<std::uint32_t> values;
@@ -59,4 +59,32 @@ TEST_F(BasicTests, test1) {
         output_file.write(reinterpret_cast<const char*>(&v), sizeof(v));
     }
     output_file.close();
+}
+
+TEST_F(BasicTests, FirmwarePVTest) {
+    timespec ts;
+    std::string readStr;
+    int32_t readInt;
+
+    iface->writeCSValue("/tmpeDevice-FW.StateMachine.setState", ts, static_cast<std::int32_t>(nds::state_t::on));
+
+    iface->readCSValue("/tmpeDevice-FW.Version", &ts, &readStr);
+    std::cout << "Read " << readStr << " from " << "/tmpeDevice-FW.Version" << std::endl;
+    iface->readCSValue("/tmpeDevice-FW.Status", &ts, &readInt);
+    std::cout << "Read " << readInt << " from " << "/tmpeDevice-FW.Status" << std::endl;
+    iface->readCSValue("/tmpeDevice-FW.HWRevision", &ts, &readStr);
+    std::cout << "Read " << readStr << " from " << "/tmpeDevice-FW.HWRevision" << std::endl;
+    iface->readCSValue("/tmpeDevice-FW.SerialNumber", &ts, &readStr);
+    std::cout << "Read " << readStr << " from " << "/tmpeDevice-FW.SerialNumber" << std::endl;
+    iface->readCSValue("/tmpeDevice-FW.Model", &ts, &readStr);
+    std::cout << "Read " << readStr << " from " << "/tmpeDevice-FW.Model" << std::endl;
+    iface->readCSValue("/tmpeDevice-FW.Type", &ts, &readStr);
+    std::cout << "Read " << readStr << " from " << "/tmpeDevice-FW.Type" << std::endl;
+    iface->readCSValue("/tmpeDevice-FW.DriverVersion", &ts, &readStr);
+    std::cout << "Read " << readStr << " from " << "/tmpeDevice-FW.DriverVersion" << std::endl;
+    iface->readCSValue("/tmpeDevice-FW.ChassisNumber", &ts, &readInt);
+    std::cout << "Read " << readInt << " from " << "/tmpeDevice-FW.ChassisNumber" << std::endl;
+    iface->readCSValue("/tmpeDevice-FW.SlotNumber", &ts, &readInt);
+    std::cout << "Read " << readInt << " from " << "/tmpeDevice-FW.SlotNumber" << std::endl;
+    // iface->readCSValue("/tmpeDevice-FW-FilePath", &ts, &readStr);
 }

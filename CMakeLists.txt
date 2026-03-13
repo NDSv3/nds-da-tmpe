@@ -34,12 +34,13 @@ find_package(nds-da REQUIRED)
 # ============================== NDS-TMPE =====================================
 add_library(nds-tmpe SHARED
     "src/main/c++/nds-tmpe/nds-tmpe.cpp"
+    "src/main/c++/nds-tmpe/nds-tmpeFirmware.cpp"
 )
 target_include_directories(nds-tmpe PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/c++/include>
     $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(nds-tmpe PRIVATE nds3 nds-da)
+target_link_libraries(nds-tmpe PUBLIC nds3 nds-da)
 target_compile_options(nds-tmpe PRIVATE -Wall -Wextra -Wpedantic)
 set(CMAKE_CXX_CLANG_TIDY clang-tidy)
 

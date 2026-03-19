@@ -9,6 +9,6 @@
         <ndsda:PV name="ADCConfig"  register="BSP.ADC_CONFIG" type="int32"/>
         <ndsda:PV name="DACConfig"  register="BSP.DAC_CONFIG" type="int32"/>
         <ndsda:PV name="C2HEna"     register="BSP.C2H_ENA"    type="int32"/>
-        <ndsda:PV name="DMASamples" register="DMA_SAMPLES"    type="vector(uint32)" nElem="200" />
+        <ndsda:PV name="DMASamples" register="DMA_SAMPLES"    type="vector(int32)" nElem="4096" />
     </ndsda:PVMap>
 </ndsda:NodeMap>

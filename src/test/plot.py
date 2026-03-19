@@ -9,7 +9,7 @@ def plot_binary_uint64(file_path):
         return
 
     try:
-        data = np.fromfile(file_path, dtype=np.uint64) * 10.24 / (2**(64 - 16))
+        data = np.fromfile(file_path, dtype=np.uint32) * 10.24 / (2**(32 - 16))
     except Exception as e:
         print(f"Failed to read file: {e}")
         return
@@ -22,7 +22,7 @@ def plot_binary_uint64(file_path):
 
     plt.title(f"Visualizing Binary Data: {os.path.basename(file_path)}")
     plt.xlabel("Sample Index")
-    plt.ylabel("Value (uint64)")
+    plt.ylabel("Value (uint32)")
     plt.grid(True, which='both', linestyle='--', alpha=0.5)
 
     plt.tight_layout()

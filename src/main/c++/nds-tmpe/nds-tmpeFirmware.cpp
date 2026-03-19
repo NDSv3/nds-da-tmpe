@@ -21,7 +21,7 @@ ndstmpeFirmware::ndstmpeFirmware(const std::string& name, ndsda::ndsdaDevice& da
         [this](const timespec& t, const std::string& str) {
             this->firmwarePathWriter(t, str);
         }, // String writer fn
-        nds::autoEnable_t::none
+        nds::autoEnable_t::on
     ), daDevice(daDevice) { }
 // clang-format on
 

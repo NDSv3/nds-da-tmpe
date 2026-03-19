@@ -35,6 +35,7 @@ find_package(nds-da REQUIRED)
 add_library(nds-tmpe SHARED
     "src/main/c++/nds-tmpe/nds-tmpe.cpp"
     "src/main/c++/nds-tmpe/nds-tmpeFirmware.cpp"
+    "src/main/c++/nds-tmpe/nds-tmpeDAQ.cpp"
 )
 target_include_directories(nds-tmpe PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/c++/include>

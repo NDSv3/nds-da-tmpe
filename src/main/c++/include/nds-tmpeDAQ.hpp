@@ -9,7 +9,7 @@
 
 namespace nds_tmpe {
 
-class tmpeDAQ : public nds::DataAcquisition<std::vector<int32_t>> {
+class tmpeDAQ : public nds::DataAcquisition<std::vector<float>> {
 public:
     enum class ADCGainRange {
         PLUS_5_12       = 0,
@@ -30,6 +30,7 @@ private:
 
     std::atomic_uint32_t pushedBlocks;
     std::atomic_bool isRunning;
+    std::atomic<ADCGainRange> currentRange;
 
     nds::PVDelegateOut<int32_t> rangePV;
     nds::PVVariableIn<int32_t> rangePV_RBV;

@@ -4,6 +4,7 @@
 #include <ctime>
 #include <ndsdaDevice.hpp>
 #include "nds-tmpe.hpp"
+#include <ranges>
 
 namespace nds_tmpe {
 
@@ -13,7 +14,7 @@ static constexpr int32_t CLK_BASE_FREQ   = 100'000'000;  // 100 MHz base clock f
 
 // clang-format off
 tmpeDAQ::tmpeDAQ(const std::string& name, ndsda::ndsdaDevice& daDevice)
-    : nds::DataAcquisition<std::vector<int32_t>>(name, DAQ_MAX_ELEMENTS,
+    : nds::DataAcquisition<std::vector<float>>(name, DAQ_MAX_ELEMENTS,
         [this](){ this->switchOn({}); },  // Switch on
         [this](){ this->switchOff({}); },  // Switch off
         [this](){ this->start({}); },  // Start
@@ -34,7 +35,7 @@ tmpeDAQ::tmpeDAQ(const std::string& name, ndsda::ndsdaDevice& daDevice)
         [this](const timespec& time, int32_t value) { this->PV_SamplingRate_Writer(time, value); },
         nds::autoEnable_t::on
     ),
-    daDevice(daDevice), acquisitionThread(), pushedBlocks(0),
+    daDevice(daDevice), acquisitionThread(), pushedBlocks(0), currentRange(ADCGainRange::PLUS_5_12),
     rangePV("Range", [this](const timespec& time, int32_t value) { this->PV_Range_Writer(time, value); }),
     rangePV_RBV("Range_RBV") {
         this->addChild(rangePV);
@@ -179,26 +180,48 @@ void tmpeDAQ::PV_Range_Writer(const timespec& time, int32_t value) {
             std::bit_cast<int32_t>((res.assume_value().first & 0xFFFFFFF8) | value),
             time
         );
+        this->rangePV_RBV.setValue(value);
+        this->rangePV_RBV.push(time, value);
+        this->currentRange.store(static_cast<ADCGainRange>(value));
     } else {
         throw nds::NdsError(res.assume_error().what());
     }
 }
 
-static void compactVector(std::vector<int32_t>& vec) {
+static std::vector<float> processVector(const std::vector<int32_t>& vec, tmpeDAQ::ADCGainRange range) {
+    // clang-format off
+    auto processLambda = [range](uint32_t rawWord) {
+        // Samples are carried in bits 31:16 of each odd DMA word.
+        const uint32_t adcCode = (rawWord >> 16) & 0xFFFFu;
+        float v = static_cast<float>(adcCode) / 65536.0f;
+        switch (range) {
+            case tmpeDAQ::ADCGainRange::PLUS_5_12: return v * 5.12f;
+            case tmpeDAQ::ADCGainRange::PLUS_10: return v * 10.0f;
+            case tmpeDAQ::ADCGainRange::PLUS_10_24: return v * 10.24f;
+            case tmpeDAQ::ADCGainRange::PLUSMINUS_5: return (v - 0.5f) * 10.0f;
+            case tmpeDAQ::ADCGainRange::PLUSMINUS_5_12: return (v - 0.5f) * 10.24f;
+            case tmpeDAQ::ADCGainRange::PLUSMINUS_10: return (v - 0.5f) * 20.0f;
+            case tmpeDAQ::ADCGainRange::PLUSMINUS_10_24: return (v - 0.5f) * 20.48f;
+            default: return v * 5.12f;
+        }
+    };
+    // clang-format on
+
+    std::vector<float> processedVec(vec.size() / 2);
     size_t writeIndex = 0;
     for (size_t readIndex = 1; readIndex < vec.size(); readIndex += 2) {
-        vec[writeIndex++] = vec[readIndex];
+        processedVec[writeIndex++] = processLambda(vec[readIndex]);
     }
-    vec.resize(writeIndex);
-    vec.shrink_to_fit();
+
+    return processedVec;
 }
 
 void tmpeDAQ::threadBody() {
     while (this->isRunning.load()) {
         auto [block, ts] = TRY_OR_THROW(this->daDevice.readPV<std::vector<int32_t>>("DMASamples"));
-        compactVector(block);
+        auto processedBlock = processVector(block, this->currentRange.load());
 
-        this->push(ts, block);
+        this->push(ts, processedBlock);
         this->pushedBlocks++;
         this->setNumberOfPushedDataBlocks(ts, pushedBlocks);
     }

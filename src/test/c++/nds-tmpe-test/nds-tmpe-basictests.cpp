@@ -5,7 +5,9 @@
 #include <cstddef>
 #include <ctime>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
+#include <limits>
 
 #include "nds-tmpe-fixture.hpp"
 #include "nds-tmpeDAQ.hpp"
@@ -17,11 +19,6 @@ static constexpr size_t READ_VALUES = 200;
 TEST_F(BasicTests, PlainPVTest) {
     int32_t val;
     timespec time;
-    std::vector<std::uint32_t> values;
-    std::vector<uint64_t> assembled_values;
-
-    values.reserve(READ_VALUES);
-    assembled_values.reserve(READ_VALUES / 2);
 
     val = 1000;
     std::cout << "Setting sampleEOC to " << val << "...";
@@ -32,35 +29,6 @@ TEST_F(BasicTests, PlainPVTest) {
     iface->readCSValue("/tmpeDevice-SampleEOCSet", &time, &val);
     std::cout << val << std::endl;
     ASSERT_EQ(val, 1000);
-
-    val = 1;
-    std::cout << "Setting C2HEnaSet to " << val << "...";
-    iface->writeCSValue("/tmpeDevice-C2HEnaSet", time, val);
-    std::cout << "OK" << std::endl;
-
-    std::cout << "Reading DMASamplesGet...";
-    iface->readCSValue("/tmpeDevice-DMASamplesGet", &time, &values);
-    std::cout << "OK" << std::endl;
-
-    val = 0;
-    std::cout << "Setting C2HEnaSet to " << val << "...";
-    iface->writeCSValue("/tmpeDevice-C2HEnaSet", time, val);
-    std::cout << "OK" << std::endl;
-
-    for (size_t i = 0; i < READ_VALUES / 2; i++) {
-        assembled_values.push_back((static_cast<uint64_t>(values[2 * i + 1]) << 32) | values[2 * i]);
-    }
-
-    // Write to a binary file
-    std::ofstream output_file("output.bin", std::ios::binary);
-    if (!output_file) {
-        std::cerr << "Error opening file for writing." << std::endl;
-        return;
-    }
-    for (const auto& v : assembled_values) {
-        output_file.write(reinterpret_cast<const char*>(&v), sizeof(v));
-    }
-    output_file.close();
 }
 
 TEST_F(BasicTests, FirmwarePVTest) {
@@ -122,19 +90,21 @@ TEST_F(BasicTests, DAQTest) {
     ASSERT_GT(readInt, 0) << "No data blocks were pushed";
     std::cout << "[TEST] Read " << readInt << " data blocks" << std::endl;
 
-    const std::vector<std::int32_t>* valPtr = nullptr;
+    const std::vector<float>* valPtr        = nullptr;
     const timespec* tsPtr                   = nullptr;
     for (int i = 0; i < readInt; i++) {
-        iface->getPushedVectorInt32("/tmpeDevice-DAQ.Data", tsPtr, valPtr);
+        iface->getPushedVectorFloat("/tmpeDevice-DAQ.Data", tsPtr, valPtr);
         ASSERT_NE(valPtr, nullptr) << "Data pointer is null";
         ASSERT_FALSE(valPtr->empty()) << "Obtained empty data block";
     }
-    const std::vector<std::int32_t> lastBlock = *valPtr;  // Copy vector
+    const std::vector<float> lastBlock = *valPtr;  // Copy vector
 
-    std::ofstream output_file("daq_output.bin", std::ios::binary);
+    std::ofstream output_file("output.csv");
     ASSERT_TRUE(output_file.is_open()) << "Error opening file for writing.";
-    for (const auto& v : lastBlock) {
-        output_file.write(reinterpret_cast<const char*>(&v), sizeof(v));
+    output_file << "value\n";
+    output_file << std::setprecision(std::numeric_limits<float>::max_digits10);
+    for (float sample : lastBlock) {
+        output_file << sample << "\n";
     }
     output_file.close();
 }

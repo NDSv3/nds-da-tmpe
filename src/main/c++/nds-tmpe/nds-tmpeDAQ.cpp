@@ -5,6 +5,8 @@
 #include <ndsdaDevice.hpp>
 #include "nds-tmpe.hpp"
 #include <ranges>
+#include <chrono>
+#include <fstream>
 
 namespace nds_tmpe {
 
@@ -217,13 +219,36 @@ static std::vector<float> processVector(const std::vector<int32_t>& vec, tmpeDAQ
 }
 
 void tmpeDAQ::threadBody() {
+    std::vector<double> intervals;
+    intervals.reserve(10000);  // Reserve for ~200 seconds of 20ms block periods
+    auto lastBlockTime = std::chrono::steady_clock::now();
+    bool isFirstBlock = true;
+
     while (this->isRunning.load()) {
         auto [block, ts] = TRY_OR_THROW(this->daDevice.readPV<std::vector<int32_t>>("DMASamples"));
+
+        auto now = std::chrono::steady_clock::now();
+        if (!isFirstBlock) {
+            double diffMs = std::chrono::duration<double, std::milli>(now - lastBlockTime).count();
+            intervals.push_back(diffMs);
+        }
+        isFirstBlock = false;
+        lastBlockTime = now;
+
         auto processedBlock = processVector(block, this->currentRange.load());
 
         this->push(ts, processedBlock);
         this->pushedBlocks++;
         this->setNumberOfPushedDataBlocks(ts, pushedBlocks);
+    }
+
+    // Save block timing intervals to CSV when the thread terminates (acquisition stops)
+    std::ofstream timingFile("daq_block_timings.csv");
+    if (timingFile.is_open()) {
+        timingFile << "interval_ms\n";
+        for (double interval : intervals) {
+            timingFile << interval << "\n";
+        }
     }
 }
 

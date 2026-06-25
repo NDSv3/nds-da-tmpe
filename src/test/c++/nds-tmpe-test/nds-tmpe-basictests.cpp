@@ -2,7 +2,6 @@
 #include <nds3/nds.h>
 #include <nds3/ndsTestFactory.h>
 #include <unistd.h>
-#include <cstddef>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -14,18 +13,16 @@
 
 using BasicTests = ndstmpeFixture;
 
-static constexpr size_t READ_VALUES = 200;
-
 TEST_F(BasicTests, PlainPVTest) {
     int32_t val;
     timespec time;
 
     val = 1000;
-    std::cout << "Setting sampleEOC to " << val << "...";
+    std::cout << "[TEST] Setting sampleEOC to " << val << "...";
     iface->writeCSValue("/tmpeDevice-SampleEOCSet", time, val);
     std::cout << "OK" << std::endl;
 
-    std::cout << "Reading sampleEOC: ";
+    std::cout << "[TEST] Reading sampleEOC: ";
     iface->readCSValue("/tmpeDevice-SampleEOCSet", &time, &val);
     std::cout << val << std::endl;
     ASSERT_EQ(val, 1000);
@@ -39,23 +36,23 @@ TEST_F(BasicTests, FirmwarePVTest) {
     iface->writeCSValue("/tmpeDevice-FW.StateMachine.setState", ts, static_cast<std::int32_t>(nds::state_t::on));
 
     iface->readCSValue("/tmpeDevice-FW.Version", &ts, &readStr);
-    std::cout << "Read " << readStr << " from " << "/tmpeDevice-FW.Version" << std::endl;
+    std::cout << "[TEST] Read " << readStr << " from " << "/tmpeDevice-FW.Version" << std::endl;
     iface->readCSValue("/tmpeDevice-FW.Status", &ts, &readInt);
-    std::cout << "Read " << readInt << " from " << "/tmpeDevice-FW.Status" << std::endl;
+    std::cout << "[TEST] Read " << readInt << " from " << "/tmpeDevice-FW.Status" << std::endl;
     iface->readCSValue("/tmpeDevice-FW.HWRevision", &ts, &readStr);
-    std::cout << "Read " << readStr << " from " << "/tmpeDevice-FW.HWRevision" << std::endl;
+    std::cout << "[TEST] Read " << readStr << " from " << "/tmpeDevice-FW.HWRevision" << std::endl;
     iface->readCSValue("/tmpeDevice-FW.SerialNumber", &ts, &readStr);
-    std::cout << "Read " << readStr << " from " << "/tmpeDevice-FW.SerialNumber" << std::endl;
+    std::cout << "[TEST] Read " << readStr << " from " << "/tmpeDevice-FW.SerialNumber" << std::endl;
     iface->readCSValue("/tmpeDevice-FW.Model", &ts, &readStr);
-    std::cout << "Read " << readStr << " from " << "/tmpeDevice-FW.Model" << std::endl;
+    std::cout << "[TEST] Read " << readStr << " from " << "/tmpeDevice-FW.Model" << std::endl;
     iface->readCSValue("/tmpeDevice-FW.Type", &ts, &readStr);
-    std::cout << "Read " << readStr << " from " << "/tmpeDevice-FW.Type" << std::endl;
+    std::cout << "[TEST] Read " << readStr << " from " << "/tmpeDevice-FW.Type" << std::endl;
     iface->readCSValue("/tmpeDevice-FW.DriverVersion", &ts, &readStr);
-    std::cout << "Read " << readStr << " from " << "/tmpeDevice-FW.DriverVersion" << std::endl;
+    std::cout << "[TEST] Read " << readStr << " from " << "/tmpeDevice-FW.DriverVersion" << std::endl;
     iface->readCSValue("/tmpeDevice-FW.ChassisNumber", &ts, &readInt);
-    std::cout << "Read " << readInt << " from " << "/tmpeDevice-FW.ChassisNumber" << std::endl;
+    std::cout << "[TEST] Read " << readInt << " from " << "/tmpeDevice-FW.ChassisNumber" << std::endl;
     iface->readCSValue("/tmpeDevice-FW.SlotNumber", &ts, &readInt);
-    std::cout << "Read " << readInt << " from " << "/tmpeDevice-FW.SlotNumber" << std::endl;
+    std::cout << "[TEST] Read " << readInt << " from " << "/tmpeDevice-FW.SlotNumber" << std::endl;
     // iface->readCSValue("/tmpeDevice-FW-FilePath", &ts, &readStr);
 }
 
@@ -82,7 +79,7 @@ TEST_F(BasicTests, DAQTest) {
 
     std::cout << "[TEST] Starting acquisition for 1 second...";
     iface->writeCSValue("/tmpeDevice-DAQ.StateMachine.setState", ts, static_cast<std::int32_t>(nds::state_t::running));
-    ::sleep(1);
+    ::sleep(20);
     iface->writeCSValue("/tmpeDevice-DAQ.StateMachine.setState", ts, static_cast<std::int32_t>(nds::state_t::on));
     std::cout << "OK" << std::endl;
 
@@ -90,8 +87,8 @@ TEST_F(BasicTests, DAQTest) {
     ASSERT_GT(readInt, 0) << "No data blocks were pushed";
     std::cout << "[TEST] Read " << readInt << " data blocks" << std::endl;
 
-    const std::vector<float>* valPtr        = nullptr;
-    const timespec* tsPtr                   = nullptr;
+    const std::vector<float>* valPtr = nullptr;
+    const timespec* tsPtr            = nullptr;
     for (int i = 0; i < readInt; i++) {
         iface->getPushedVectorFloat("/tmpeDevice-DAQ.Data", tsPtr, valPtr);
         ASSERT_NE(valPtr, nullptr) << "Data pointer is null";

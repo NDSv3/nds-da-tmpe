@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import os
 import sys
 
+import matplotlib
+
+matplotlib.rcParams.update({'font.size': 22})
+
 def plot_csv_float(file_path):
     if not os.path.exists(file_path):
         print(f"Error: File {file_path} not found.")
@@ -22,11 +26,11 @@ def plot_csv_float(file_path):
 
     # 3. Plotting
     plt.figure(figsize=(10, 6))
-    plt.plot(data[25:], linestyle='-', marker='.', markersize=2, color='blue')
+    plt.plot(data[25:], linestyle='-', marker='.', markersize=2, color='blue', linewidth=2.0)
 
-    plt.title(f"Visualizing CSV Data: {os.path.basename(file_path)}")
+    plt.title(f"NDS-TMPE Acquisition Results")
     plt.xlabel("Sample Index")
-    plt.ylabel("Value (float)")
+    plt.ylabel("Amplitude (V)")
     plt.grid(True, which='both', linestyle='--', alpha=0.5)
 
     plt.tight_layout()

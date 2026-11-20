@@ -1,3 +1,7 @@
+// Author: David Andrino-Izquierdo <david.andrino@upm.es>
+// Copyright 2026 I2A2-UPM
+// SPDX-License-Identifier: Apache-2.0
+
 #include "nds-tmpeDAQ.hpp"
 #include <nds3/exceptions.h>
 #include <cstdlib>

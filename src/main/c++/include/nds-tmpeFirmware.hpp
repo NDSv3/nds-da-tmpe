@@ -1,3 +1,7 @@
+// Author: David Andrino-Izquierdo <david.andrino@upm.es>
+// Copyright 2026 I2A2-UPM
+// SPDX-License-Identifier: Apache-2.0
+
 #ifndef NDS_TMPE_FIRMWARE_HPP
 #define NDS_TMPE_FIRMWARE_HPP
 

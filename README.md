@@ -9,7 +9,9 @@ Nominal Device Support driver for interfacing with the TEWS TMPE627 for data acq
 Requirements:
 
 - [NDS-DA](https://github.com/ndsv3/nds-da)
-- TMPE627 FWK Design: TODO
+    - [NDS](https://github.com/ndsv3/nds-core)
+    - [ChimeraTK DeviceAccess](https://github.com/ChimeraTK/DeviceAccess)
+- [TMPE627 FWK Design](https://github.com/i2a2/tmpe_fwk)
 
 ## License
 
